@@ -11,6 +11,8 @@ func carregarDados() Banco {
 		Cadastros: make(map[string]Cadastro),
 	}
 
+	os.MkdirAll("db", 0755)
+
 	dados, err := os.ReadFile("db/dados.json")
 	if err != nil {
 		if !os.IsNotExist(err) {
