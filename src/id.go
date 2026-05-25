@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func gerarID() string {
+func generateID() string {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	return fmt.Sprintf("%08d", rng.Intn(100000000))
 }

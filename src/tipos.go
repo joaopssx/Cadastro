@@ -1,11 +1,11 @@
 package main
 
-type Cadastro struct {
+type Record struct {
 	ID       string
-	Nome     string
-	Situacao string
+	Name     string
+	Status   string
 }
 
-type Banco struct {
-	Cadastros map[string]Cadastro
+type Database struct {
+	Records map[string]Record
 }

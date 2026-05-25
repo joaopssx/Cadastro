@@ -4,8 +4,8 @@ import (
 	"strings"
 )
 
-func normalizarSituacao(situacao string) (string, bool) {
-	s := strings.ToLower(strings.TrimSpace(situacao))
+func normalizeStatus(status string) (string, bool) {
+	s := strings.ToLower(strings.TrimSpace(status))
 	if s == "pago" {
 		return "Pago", true
 	}
@@ -15,91 +15,91 @@ func normalizarSituacao(situacao string) (string, bool) {
 	return "", false
 }
 
-func listarTodos() []Cadastro {
-	banco := carregarDados()
-	lista := make([]Cadastro, 0, len(banco.Cadastros))
-	for _, c := range banco.Cadastros {
-		lista = append(lista, c)
+func listAll() []Record {
+	db := loadData()
+	list := make([]Record, 0, len(db.Records))
+	for _, r := range db.Records {
+		list = append(list, r)
 	}
-	return lista
+	return list
 }
 
-func buscarPorID(id string) (Cadastro, bool) {
-	banco := carregarDados()
-	c, ok := banco.Cadastros[id]
-	return c, ok
+func findByID(id string) (Record, bool) {
+	db := loadData()
+	r, ok := db.Records[id]
+	return r, ok
 }
 
-func adicionar(nome, situacao string) (bool, string) {
-	banco := carregarDados()
+func add(name, status string) (bool, string) {
+	db := loadData()
 
-	sitNormalizada, valida := normalizarSituacao(situacao)
-	if !valida {
+	normalizedStatus, isValid := normalizeStatus(status)
+	if !isValid {
 		return false, "Situação inválida. Use apenas 'pago' ou 'atrasado'"
 	}
 
-	id := gerarID()
+	id := generateID()
 	for {
-		if _, existe := banco.Cadastros[id]; !existe {
+		if _, exists := db.Records[id]; !exists {
 			break
 		}
-		id = gerarID()
+		id = generateID()
 	}
 
-	banco.Cadastros[id] = Cadastro{
+	db.Records[id] = Record{
 		ID:       id,
-		Nome:     nome,
-		Situacao: sitNormalizada,
+		Name:     name,
+		Status:   normalizedStatus,
 	}
-	salvarDados(banco)
+	saveData(db)
 
 	return true, "Cadastro adicionado com sucesso. ID gerado: " + id
 }
 
-func remover(id string) (bool, string) {
-	banco := carregarDados()
+func remove(id string) (bool, string) {
+	db := loadData()
 
-	if _, existe := banco.Cadastros[id]; !existe {
+	if _, exists := db.Records[id]; !exists {
 		return false, "Cadastro não encontrado"
 	}
 
-	delete(banco.Cadastros, id)
-	salvarDados(banco)
+	delete(db.Records, id)
+	saveData(db)
 
 	return true, "Cadastro removido com sucesso"
 }
 
-func alterarSituacao(id, novaSituacao string) (bool, string) {
-	banco := carregarDados()
+func updateStatus(id, newStatus string) (bool, string) {
+	db := loadData()
 
-	cadastro, existe := banco.Cadastros[id]
-	if !existe {
+	record, exists := db.Records[id]
+	if !exists {
 		return false, "Cadastro não encontrado"
 	}
 
-	sitNormalizada, valida := normalizarSituacao(novaSituacao)
-	if !valida {
+	normalizedStatus, isValid := normalizeStatus(newStatus)
+	if !isValid {
 		return false, "Situação inválida. Use apenas 'pago' ou 'atrasado'"
 	}
 
-	cadastro.Situacao = sitNormalizada
-	banco.Cadastros[id] = cadastro
-	salvarDados(banco)
+	record.Status = normalizedStatus
+	db.Records[id] = record
+	saveData(db)
 
 	return true, "Situação alterada com sucesso"
 }
 
-func estatisticas() (total, pagos, atrasados int) {
-	banco := carregarDados()
+func statistics() (total, paid, overdue int) {
+	db := loadData()
 
-	for _, c := range banco.Cadastros {
+	for _, r := range db.Records {
 		total++
-		if c.Situacao == "Pago" {
-			pagos++
-		} else if c.Situacao == "Atrasado" {
-			atrasados++
+		if r.Status == "Pago" {
+			paid++
+		} else if r.Status == "Atrasado" {
+			overdue++
 		}
 	}
 
-	return total, pagos, atrasados
+	return total, paid, overdue
 }
