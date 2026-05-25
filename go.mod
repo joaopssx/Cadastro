@@ -1,0 +1,3 @@
+module cadastro
+
+go 1.26.2
